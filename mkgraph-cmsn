@@ -1,0 +1,8 @@
+#! /bin/sh
+#
+RRDFILE=/var/www/html/rrd/m4229-sn.rrd
+GRPFILE=/var/www/html/rrd/m4229-sn.png
+
+rrdtool graph ${GRPFILE} DEF:cmsn=${RRDFILE}:cmsn:AVERAGE DEF:cmtssn=${RRDFILE}:cmtssn:AVERAGE LINE1:cmsn#ff0000 LINE1:cmtssn#00ff00
+
+

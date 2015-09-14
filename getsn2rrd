@@ -1,0 +1,19 @@
+#! /bin/sh
+#
+RRDFILE=/var/www/html/rrd/m4229-sn.rrd
+CMIPADDR=172.17.254.123
+CMTSIPADDR=192.168.4.51
+CMPTR=246
+
+if [ ! -f ${RRDFILE} ]; then
+  rrdtool create ${RRDFILE} --step 300 DS:cmsn:GAUGE:600:0:60 DS:cmtssn:GAUGE:600:0:60 RRA:AVERAGE:0.5:3:2880 RRA:AVERAGE:0.5:3:2880
+fi
+
+# CM S/N
+CMSN=`snmpget -Oqv -c public -v1 ${CMIPADDR} .1.3.6.1.2.1.10.127.1.1.4.1.5.3`
+VCMSN=`echo "scale=1; ${CMSN} / 10" | bc`
+# CMTS S/N
+CMTSSN=`snmpget -Oqv -c public -v2c ${CMTSIPADDR} .1.3.6.1.2.1.10.127.1.3.3.1.13.${CMPTR}`
+VCMTSSN=`echo "scale=1; ${CMTSSN} / 10" | bc`
+TS=`date "+%s"`
+rrdtool update ${RRDFILE} --template cmsn:cmtssn ${TS}:${VCMSN}:${VCMTSSN}
